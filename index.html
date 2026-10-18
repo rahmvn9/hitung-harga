@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator HPP Percetakan</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f4ef;--card:#fff;--tx:#1d1d1b;--mu:#6b6a64;--bd:#e0ddd3;--ac:#0f6b5c;--ac2:#e6f2ef;--wa:#b4531a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151614;--card:#1f211e;--tx:#ecebe6;--mu:#9d9b92;--bd:#34362f;--ac:#4fc3ad;--ac2:#1c2e2a;--wa:#e8985c}}
+:root[data-theme="dark"]{--bg:#151614;--card:#1f211e;--tx:#ecebe6;--mu:#9d9b92;--bd:#34362f;--ac:#4fc3ad;--ac2:#1c2e2a;--wa:#e8985c}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:720px;margin:0 auto;padding:16px 14px 48px}
+h1{font-size:20px;margin:6px 0 2px}
+.sub{color:var(--mu);margin:0 0 14px;font-size:13px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
+h2{font-size:15px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px}
+input,select,button{font:inherit;color:var(--tx)}
+input,select{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:9px;padding:8px 9px;min-width:0}
+input:focus,select:focus{outline:2px solid var(--ac);outline-offset:-1px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.pre{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pre button,.add,.rm{border:1px solid var(--bd);background:var(--bg);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:13px}
+.pre button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.add{color:var(--ac);border-style:dashed;border-radius:9px;width:100%;margin-top:6px;padding:8px}
+.row{display:grid;grid-template-columns:1fr 1fr auto auto;gap:6px;padding:10px 0;border-top:1px solid var(--bd)}
+.row .nm{grid-column:1/-1}
+.row .sb{grid-column:1/-1;font-size:12px;color:var(--mu);text-align:right}
+.rm{border-radius:9px;padding:0 11px;color:var(--wa)}
+.hint{font-size:12px;color:var(--mu);margin:8px 0 0}
+.res .l{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--bd);gap:10px}
+.res .l:first-of-type{border-top:0}
+.res .l span:first-child{color:var(--mu)}
+.big{background:var(--ac2);border-radius:11px;padding:12px;margin:10px 0}
+.big .l{border:0!important;padding:3px 0!important}
+.big b{font-size:18px}
+.t{font-weight:700}
+.warn{background:var(--ac2);border-left:3px solid var(--wa);padding:8px 10px;border-radius:8px;font-size:12.5px;margin-top:10px}
+.rs{background:none;border:0;color:var(--mu);font-size:12px;text-decoration:underline;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Kalkulator HPP Percetakan</h1>
+<p class="sub">Hitung modal per pcs dan harga jual untuk satu orderan.</p>
+
+<div class="c">
+<h2>1. Orderan</h2>
+<div class="pre" id="pre"></div>
+<div class="g2">
+<div><label>Nama produk</label><input id="nama" placeholder="mis. Undangan Pernikahan"></div>
+<div><label>Jumlah order (pcs)</label><input id="qty" type="number" inputmode="numeric" min="1"></div>
+</div>
+</div>
+
+<div class="c">
+<h2>2. Bahan baku</h2>
+<div id="bahan"></div>
+<button class="add" data-add="bahan">+ Tambah bahan</button>
+<div class="g2" style="margin-top:12px">
+<div><label>Cadangan rusak/salah cetak (%)</label><input id="waste" type="number" inputmode="decimal" min="0"></div>
+</div>
+<p class="hint">Basis "per pcs" dikalikan jumlah order; "total order" dihitung sekali saja (mis. 1 rim kertas, 1 pita).</p>
+</div>
+
+<div class="c">
+<h2>3. Biaya operasional rata-rata</h2>
+<div id="over"></div>
+<button class="add" data-add="over">+ Tambah biaya</button>
+<p class="hint">Biaya bulanan (listrik, sewa, penyusutan) dibagi dulu: total sebulan ÷ perkiraan jumlah order sebulan, lalu isi sebagai "total order".</p>
+</div>
+
+<div class="c">
+<h2>4. Keuntungan</h2>
+<div class="g2">
+<div><label>Markup dari modal (%)</label><input id="mk" type="number" inputmode="decimal" min="0"></div>
+<div><label>Bulatkan harga/pcs ke atas</label>
+<select id="rd"><option value="0">Tanpa pembulatan</option><option value="100">Rp 100</option><option value="500">Rp 500</option><option value="1000">Rp 1.000</option></select></div>
+</div>
+</div>
+
+<div class="c res">
+<h2>Hasil <button class="rs" id="reset">Reset semua</button></h2>
+<div class="l"><span>Total bahan</span><span id="rB"></span></div>
+<div class="l"><span>Cadangan rusak</span><span id="rW"></span></div>
+<div class="l"><span>Biaya operasional</span><span id="rO"></span></div>
+<div class="l t"><span>Total HPP (modal)</span><span id="rH"></span></div>
+<div class="big">
+<div class="l"><span>HPP per pcs</span><b id="rHp"></b></div>
+<div class="l"><span>Harga jual per pcs</span><b id="rJp"></b></div>
+</div>
+<div class="l"><span>Total harga jual</span><span id="rJ"></span></div>
+<div class="l"><span>Laba kotor</span><span id="rL"></span></div>
+<div class="l"><span>Margin sebenarnya (laba ÷ harga jual)</span><span id="rM"></span></div>
+<div class="warn" id="wn"></div>
+</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const PRE={
+yasin:{nama:'Yasin',b:['Cover','Isi yasin (kertas)','Gantungan pembatas','Jilid / staples','Plastik / kemasan']},
+nota:{nama:'Nota',b:['Kertas','Sampul','Lem','Perforasi / numerator']},
+undangan:{nama:'Undangan',b:['Kertas','Plastik','Label nama','Amplop','Pita / aksesori']},
+lain:{nama:'',b:['Bahan 1']}
+};
+const OV=['Tinta','Listrik','Tenaga kerja','Sewa tempat','Penyusutan mesin','Lain-lain'];
+const mk=(n,b)=>({n,j:1,h:0,b});
+function fresh(k){const p=PRE[k];return{pre:k,nama:p.nama,qty:100,waste:5,mk:20,rd:'500',bahan:p.b.map(n=>mk(n,'pcs')),over:OV.map(n=>mk(n,'order'))}}
+let S;
+try{S=JSON.parse(localStorage.getItem('hpp_v1'))}catch(e){S=null}
+if(!S||!S.bahan)S=fresh('undangan');
+
+const rp=v=>'Rp '+Math.round(v||0).toLocaleString('id-ID');
+const num=v=>+v||0;
+const cost=r=>{const v=num(r.j)*num(r.h);return r.b==='pcs'?v*num(S.qty):v};
+const sum=l=>l.reduce((s,r)=>s+cost(r),0);
+const save=()=>{try{localStorage.setItem('hpp_v1',JSON.stringify(S))}catch(e){}};
+
+function rows(l){
+$(l).innerHTML=S[l].map((r,i)=>`<div class="row">
+<input class="nm" data-l="${l}" data-i="${i}" data-k="n" value="${String(r.n).replace(/"/g,'&quot;')}" placeholder="Nama">
+<div><label>Jumlah</label><input type="number" inputmode="decimal" data-l="${l}" data-i="${i}" data-k="j" value="${r.j}"></div>
+<div><label>Harga satuan (Rp)</label><input type="number" inputmode="decimal" data-l="${l}" data-i="${i}" data-k="h" value="${r.h||''}" placeholder="0"></div>
+<div><label>Basis</label><select data-l="${l}" data-i="${i}" data-k="b"><option value="pcs"${r.b==='pcs'?' selected':''}>per pcs</option><option value="order"${r.b==='order'?' selected':''}>total order</option></select></div>
+<div><label>&nbsp;</label><button class="rm" data-del="${l}:${i}" aria-label="Hapus">✕</button></div>
+<div class="sb" id="sb-${l}-${i}"></div></div>`).join('');
+}
+function pre(){
+$('pre').innerHTML=Object.keys(PRE).map(k=>`<button data-pre="${k}" class="${S.pre===k?'on':''}">${k==='lain'?'Lainnya':PRE[k].nama}</button>`).join('');
+}
+function fill(){
+pre();rows('bahan');rows('over');
+$('nama').value=S.nama;$('qty').value=S.qty;$('waste').value=S.waste;$('mk').value=S.mk;$('rd').value=S.rd;
+calc();
+}
+function calc(){
+const q=num(S.qty);
+S.bahan.concat([]).forEach((r,i)=>{const e=$('sb-bahan-'+i);if(e)e.textContent='Subtotal: '+rp(cost(r))});
+S.over.forEach((r,i)=>{const e=$('sb-over-'+i);if(e)e.textContent='Subtotal: '+rp(cost(r))});
+const B=sum(S.bahan),W=B*num(S.waste)/100,O=sum(S.over),H=B+W+O;
+const hp=q>0?H/q:0;
+let jp=hp*(1+num(S.mk)/100);
+const st=num(S.rd);if(st>0)jp=Math.ceil(jp/st-1e-9)*st;
+const J=jp*q,L=J-H,M=J>0?L/J*100:0;
+$('rB').textContent=rp(B);$('rW').textContent=rp(W);$('rO').textContent=rp(O);$('rH').textContent=rp(H);
+$('rHp').textContent=rp(hp);$('rJp').textContent=rp(jp);$('rJ').textContent=rp(J);$('rL').textContent=rp(L);
+$('rM').textContent=M.toFixed(1).replace('.',',')+'%';
+const mkp=num(S.mk);
+$('wn').textContent=q<=0?'Isi jumlah order lebih dari 0.':
+`Markup ${mkp}% dari modal setara margin ${(mkp/(100+mkp)*100).toFixed(1).replace('.',',')}% dari harga jual. Pastikan laba cukup menutup biaya yang belum masuk hitungan (gaji sendiri, order gagal, diskon).`;
+save();
+}
+
+document.addEventListener('input',e=>{
+const t=e.target;
+if(t.dataset.l){const r=S[t.dataset.l][t.dataset.i];r[t.dataset.k]=t.dataset.k==='n'||t.dataset.k==='b'?t.value:t.value;calc();return}
+if(t.id==='nama')S.nama=t.value;
+if(t.id==='qty')S.qty=t.value;
+if(t.id==='waste')S.waste=t.value;
+if(t.id==='mk')S.mk=t.value;
+if(t.id==='rd')S.rd=t.value;
+calc();
+});
+document.addEventListener('click',e=>{
+const b=e.target.closest('button');if(!b)return;
+if(b.dataset.pre){const q=S.qty,w=S.waste,m=S.mk,r=S.rd;S=fresh(b.dataset.pre);S.qty=q;S.waste=w;S.mk=m;S.rd=r;fill()}
+else if(b.dataset.add){S[b.dataset.add].push(mk('',b.dataset.add==='bahan'?'pcs':'order'));rows(b.dataset.add);calc()}
+else if(b.dataset.del){const[l,i]=b.dataset.del.split(':');S[l].splice(+i,1);rows(l);calc()}
+else if(b.id==='reset'){S=fresh('undangan');fill()}
+});
+fill();
+</script>
+</body>
+</html>
